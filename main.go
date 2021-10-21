@@ -5,8 +5,10 @@ import (
 	"VoteSth-socketgo/middleware"
 	answertransport "VoteSth-socketgo/modules/answer/transport"
 	questiontransport "VoteSth-socketgo/modules/question/transport"
+	"fmt"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	socketio "github.com/googollee/go-socket.io"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"log"
@@ -29,13 +31,20 @@ func main() {
 func runServer(db *gorm.DB, secretKey string) error {
 	appCtx := appctx.NewAppContext(db, secretKey)
 	r := gin.Default()
-	r.Use(cors.Default())
+	corspolicy := cors.New(cors.Config{
+		AllowOrigins: []string{"http://127.0.0.1:5500"},
+		AllowMethods:     []string{"POST, OPTIONS, GET, PUT, DELETE", "PATCH"},
+		AllowHeaders:     []string{ "Accept, Authorization, Content-Type, Content-Length, X-CSRF-Token, Token, session, Origin, Host, Connection, Accept-Encoding, Accept-Language, X-Requested-With"},
+		AllowCredentials: true,
+	})
+	r.Use(corspolicy)
 	r.Use(middleware.Recover(appCtx))
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"message": "ping",
 		})
 	})
+	r.StaticFile("/demo/","asset/index.html")
 	v1 := r.Group("/v1")
 	question := v1.Group("/question")
 	{
@@ -52,5 +61,17 @@ func runServer(db *gorm.DB, secretKey string) error {
 		answer.PATCH("/:id", answertransport.VoteAnswer(appCtx))
 		answer.DELETE("/:id", answertransport.DeleteAnswer(appCtx))
 	}
+	startSocketIOServer(r,appCtx)
 	return r.Run()
+}
+
+func startSocketIOServer(engine *gin.Engine, ctx appctx.AppContext){
+	 server := socketio.NewServer(nil)
+	 server.OnConnect("/", func(s socketio.Conn) error{
+		 fmt.Println("Connected",s.ID(),"IP:",s.RemoteHeader())
+		 return nil
+	 })
+	go server.Serve()
+	engine.GET("/socket.io/*any", gin.WrapH(server))
+	engine.POST("/socket.io/*any", gin.WrapH(server))
 }
