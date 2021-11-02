@@ -14,7 +14,7 @@ func (s *sqlStore) Get(ctx context.Context, conditions map[string]interface{}, m
 	for i := range moreKeys {
 		db = db.Preload(moreKeys[i])
 	}
-	if err := db.Where(conditions).First(&rs).Error; err != nil {
+	if err := db.Table(answermodel.Answer{}.TableName()).Where(conditions).First(&rs).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, common.ErrCannotGetEntity(questionmodel.EntityName, err)
 		}

@@ -26,3 +26,13 @@ func (bus *listAnswerBus) ListAnswer(ctx context.Context, paging *common.Paging)
 	}
 	return result, err
 }
+func (bus *listAnswerBus) GetAnswerByQuestionId(ctx context.Context, id int) ([]answermodel.Answer, error) {
+	var paging common.Paging
+	paging.Page =0
+	paging.Limit =100
+	data, err := bus.store.List(ctx, map[string]interface{}{"question_id": id},&paging)
+	if err != nil {
+		return nil, common.ErrCannotGetEntity(answermodel.EntityName, err)
+	}
+	return data, err
+}

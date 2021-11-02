@@ -25,3 +25,4 @@ func (bus *getAnswerBus) GetAnswer(ctx context.Context, id int) (*answermodel.An
 	}
 	return data, err
 }
+

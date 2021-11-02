@@ -1,0 +1,1 @@
+DBConnectionStr=postgres://postgres:123456@localhost:5432/votesth;SecretKey=ILOVEGOLANG

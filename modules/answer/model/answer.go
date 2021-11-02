@@ -13,7 +13,7 @@ type Answer struct {
 }
 
 func (Answer) TableName() string {
-	return "auestion"
+	return "answer"
 }
 func (data *Answer) Mask() {
 	data.FakeId = common.NewUID(uint32(data.Id), common.DbTypeAnswer, common.ShareID)

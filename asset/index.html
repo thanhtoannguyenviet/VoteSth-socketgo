@@ -6,18 +6,29 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Demo Socket IO</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.js"></script>
+
 </head>
 <body>
 <div id="main">
     <h1>Demo Socket IO</h1>
 </div>
 <script>
-    const socket = io("ws://127.0.0.1:8080/",{transports:['websocket']})
+    const socket = io("")
     socket.on('connect',()=>{
         console.log('Client connected')
-        socket.emit('test','Hello socket')
+
+        socket.emit("getlistanswer","NTQwODAzMDcz")
+
     })
+
+    socket.on("test_notice",(msg)=> console.log(msg))
+    socket.on("connect_error", (err) => {
+        console.log(err);
+    });
+
+    socket.on("listanswer",(msg)=> console.log(msg))
+    socket.on("authentication_failed",(msg)=>console.log(msg))
 </script>
 </body>
 </html>
